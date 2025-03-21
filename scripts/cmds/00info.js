@@ -1,72 +1,66 @@
-const fs = require('fs');const moment = require('moment-timezone');
+const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
+
 module.exports = {
-  config: {
-    name: "info",
-    aliases: ["inf", "in4"],
-    version: "2.0",
-    author: "VEX_ADNAN",
-    countDown: 5,
-    role: 0,
-    shortDescription: {
-      vi: "",
-      en: "Sends information about the bot and admin along with an image."
-    },
-    longDescription: {
-      vi: "",
-      en: "Sends information about the bot and admin along with an image."
-    },
-    category: "Information",
-    guide: {
-      en: "{pn}"
-    },
-    envConfig: {}
-  },
+config: {
+  name: "owner",
+  aurthor:"Tokodori",// Convert By Goatbot Tokodori 
+   role: 0,
+  shortDescription: " ",
+  longDescription: "",
+  category: "admin",
+  guide: "{pn}"
+},
 
-  onStart: async function ({ message }) {
-    this.sendInfo(message);
-  },
+  onStart: async function ({ api, event }) {
+  try {
+    const ownerInfo = {
+      name: '𝐓 𝐀 𝐍 𝐉 𝐈 𝐋',
+      gender: '𝐌𝐚𝐥𝐞',
+      age: '𝟏𝟖±',
+      height: '5.11',
+      choise: 'Russian 😞',
+      nick: '𝐉𝐚𝐦𝐚𝐢 𝐛𝐨𝐥𝐛𝐢  '
+    };
 
-  onChat: async function ({ event, message }) {
-    if (event.body && event.body.toLowerCase() === "info") {
-      this.sendInfo(message);
+    const bold = 'https://i.imgur.com/v9A1DLB.mp4'; // Replace with your Google Drive videoid link https://drive.google.com/uc?export=download&id=here put your video id
+
+    const tmpFolderPath = path.join(__dirname, 'tmp');
+
+    if (!fs.existsSync(tmpFolderPath)) {
+      fs.mkdirSync(tmpFolderPath);
     }
-  },
 
-  sendInfo: async function (message) {
-    const botName = " 🕸️ SpideY 🕷️ ";
-    const botPrefix = ".";
-    const authorName = "𝗔𝗬𝗔𝗡";
-    const authorFB = "NOPE 🐸";
-    const authorInsta = "Shor Mgii 😒";
-    const status = "𝗣𝘂𝗿𝗲 𝗦𝗶𝗻𝗴𝗹𝗲";
+    const videoResponse = await axios.get(bold, { responseType: 'arraybuffer' });
+    const videoPath = path.join(tmpFolderPath, 'owner_video.mp4');
 
-    const urls = JSON.parse(fs.readFileSync('scripts/cmds/assets/Ayan.json'));
-    const link = urls[Math.floor(Math.random() * urls.length)];
+    fs.writeFileSync(videoPath, Buffer.from(videoResponse.data, 'binary'));
 
-    const now = moment().tz('Asia/Dhaka');
-    const date = now.format('MMMM Do YYYY');
-    const time = now.format('h:mm:ss A');
-
-    const uptime = process.uptime();
-    const seconds = Math.floor(uptime % 60);
-    const minutes = Math.floor((uptime / 60) % 60);
-    const hours = Math.floor((uptime / (60 * 60)) % 24);
-    const days = Math.floor(uptime / (60 * 60 * 24));
-    const uptimeString = `${hours}h ${minutes}m ${seconds}sec`;
-
-    message.reply({
-      body: `╭────────────◊
+    const response = ` 
+╭[ .  ]•〆 ᵀᴬᴺᴶᴵᴸ 〆 ]  ─⦿
+╭────────────◊
 ├‣ 𝐁𝐨𝐭 & 𝐎𝐰𝐧𝐞𝐫 𝐈𝐧𝐟𝐨𝐫𝐦𝐚𝐭𝐢𝐨𝐧 
-├‣ 𝐍𝐚𝐦𝐞: ${authorName}
-├‣ 𝐁𝐨𝐭 𝐍𝐚𝐦𝐞:  ${botName}
-├‣ 𝐏𝐫𝐞𝐟𝐢𝐱:  ${botPrefix}
-├‣ 𝐅𝐛: ${authorFB}
-├‣ 𝐈𝐧𝐬𝐭𝐚𝐠𝐫𝐚𝐦:  ${authorInsta}
-├‣ 𝐑𝐞𝐥𝐚𝐭𝐢𝐨𝐧𝐬𝐡𝐢𝐩: ${status}   
-├‣ 𝐓𝐢𝐦𝐞:  ${time}
-├‣ 𝐔𝐩𝐭𝐢𝐦𝐞: ${uptimeString}
-╰────────────◊`,
-      attachment: await global.utils.getStreamFromURL(link)
-    });
+├‣ 𝐍𝐚𝐦𝐞: ${ownerInfo.name}
+├‣ 𝐆𝐞𝐧𝐝𝐞𝐫:  ${ownerInfo.gender}
+├‣ 𝐀𝐠𝐞 .${ownerInfo.age}
+├‣ 𝐍𝐢𝐜𝐤 : ${ownerInfo.nick}
+├‣ 𝐂𝐡𝐨𝐢𝐬𝐞:  ${ownerInfo.choise}   
+├‣ 𝐇𝐞𝐢𝐠𝐡𝐭 : ${ownerInfo.height}
+╰────────────◊ 
+`;
+
+    await api.sendMessage({
+      body: response,
+      attachment: fs.createReadStream(videoPath)
+    }, event.threadID, event.messageID);
+
+    if (event.body.toLowerCase().includes('ownerinfo')) {
+      api.setMessageReaction('🚀', event.messageID, (err) => {}, true);
+    }
+  } catch (error) {
+    console.error('Error in ownerinfo command:', error);
+    return api.sendMessage('An error occurred while processing the command.', event.threadID);
   }
+},
 };
