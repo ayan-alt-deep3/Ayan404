@@ -6,7 +6,7 @@ module.exports.config = {
 	description: "tag gali",
    category: "media",
 	usages: "taggali",
-	countDowns: 5,
+	countDowns: 1,
 	dependencies: {
 		"request":  ""
 	}
